@@ -1,12 +1,18 @@
 import sys
 import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
+import requests
 from flask import Flask, render_template, request
 from main import questions_and_answers
-import requests
 
-app = Flask(__name__, template_folder="../templates", static_folder="../static")
+# Add root path for importing main.py
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# Set absolute paths for templates and static folders (important for Vercel)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+TEMPLATE_FOLDER = os.path.join(BASE_DIR, "templates")
+STATIC_FOLDER = os.path.join(BASE_DIR, "static")
+
+app = Flask(__name__, template_folder=TEMPLATE_FOLDER, static_folder=STATIC_FOLDER)
 
 @app.route('/')
 def index():
@@ -49,6 +55,6 @@ def get_crypto_price(crypto_name):
     except Exception:
         return "I'm having trouble fetching the price right now. Please try again later."
 
-# Required for Vercel
+# Vercel handler
 def handler(environ, start_response):
     return app.wsgi_app(environ, start_response)
